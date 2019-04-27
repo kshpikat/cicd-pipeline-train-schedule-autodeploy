@@ -57,18 +57,15 @@ pipeline {
             when {
                 branch 'master'
             }
-            environment { 
-                CANARY_REPLICAS = 1
-            }
             steps {
                 script {
-                    def response = httpResponse (
+                    sleep (time: 5)
+                    def response = httpRequest (
                         url: "http://$KUBE_MASTER_IP:8081/",
                         timeout: 30
                     )
-                    if(response.status != 200) {
-                        error("SmokeTest did work well")
-                       
+                    if (response.status != 200) {
+                        error("Smoke test against canary deployment failed.")
                     }
                 }
                 kubernetesDeploy(
